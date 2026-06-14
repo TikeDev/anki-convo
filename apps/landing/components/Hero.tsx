@@ -38,7 +38,7 @@ export default function Hero() {
             Get Started Free
           </button>
           <a
-            href="#"
+            href="https://anki-convo-voice.vercel.app/"
             className="rounded-xl border border-border px-8 py-4 text-base font-medium text-text-primary transition hover:border-salmon hover:text-salmon"
           >
             Try the App →
