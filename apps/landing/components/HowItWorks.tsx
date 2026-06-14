@@ -23,21 +23,21 @@ export default function HowItWorks() {
   return (
     <section id="how-it-works" className="mx-auto max-w-6xl px-6 py-28">
       <div className="mb-16 text-center">
-        <h2 className="mb-4 text-4xl font-bold text-[#f0f0f0]">How It Works</h2>
-        <p className="text-[#888]">Three steps from setup to stress-free review.</p>
+        <h2 className="mb-4 text-4xl font-bold text-text-primary">How It Works</h2>
+        <p className="text-text-muted">Three steps from setup to stress-free review.</p>
       </div>
 
       <div className="grid gap-6 sm:grid-cols-3">
         {steps.map((step) => (
           <div
             key={step.number}
-            className="group relative rounded-2xl border border-[#2a2a2a] bg-[#1a1a1a] p-8 transition hover:border-[#E8736A]/40"
+            className="group relative rounded-2xl border border-border bg-surface p-8 transition hover:border-salmon/40"
           >
-            <span className="mb-4 block text-5xl font-extrabold text-[#E8736A]/20 group-hover:text-[#E8736A]/40 transition">
+            <span className="mb-4 block text-5xl font-extrabold text-salmon/20 group-hover:text-salmon/40 transition">
               {step.number}
             </span>
-            <h3 className="mb-3 text-lg font-semibold text-[#f0f0f0]">{step.title}</h3>
-            <p className="text-sm leading-relaxed text-[#888]">{step.description}</p>
+            <h3 className="mb-3 text-lg font-semibold text-text-primary">{step.title}</h3>
+            <p className="text-sm leading-relaxed text-text-muted">{step.description}</p>
           </div>
         ))}
       </div>
