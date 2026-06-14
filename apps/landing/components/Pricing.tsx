@@ -65,8 +65,8 @@ export default function Pricing() {
     <>
       <section id="pricing" className="mx-auto max-w-6xl px-6 py-28">
         <div className="mb-16 text-center">
-          <h2 className="mb-4 text-4xl font-bold text-[#f0f0f0]">Simple Pricing</h2>
-          <p className="text-[#888]">No hidden fees. Upgrade or cancel whenever you want.</p>
+          <h2 className="mb-4 text-4xl font-bold text-text-primary">Simple Pricing</h2>
+          <p className="text-text-muted">No hidden fees. Upgrade or cancel whenever you want.</p>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 max-w-2xl mx-auto">
@@ -75,30 +75,30 @@ export default function Pricing() {
               key={plan.id}
               className={`relative flex flex-col rounded-2xl border p-8 transition ${
                 plan.highlight
-                  ? 'border-[#E8736A] bg-[#1a1a1a] shadow-lg shadow-[#E8736A]/10'
-                  : 'border-[#2a2a2a] bg-[#1a1a1a]'
+                  ? 'border-salmon bg-surface shadow-lg shadow-salmon/10'
+                  : 'border-border bg-surface'
               }`}
             >
               {plan.badge && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#E8736A] px-4 py-0.5 text-xs font-semibold text-white">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-salmon px-4 py-0.5 text-xs font-semibold text-white">
                   {plan.badge}
                 </span>
               )}
 
               <div className="mb-6">
-                <h3 className="mb-1 text-lg font-semibold text-[#f0f0f0]">{plan.name}</h3>
-                <p className="text-sm text-[#888]">{plan.description}</p>
+                <h3 className="mb-1 text-lg font-semibold text-text-primary">{plan.name}</h3>
+                <p className="text-sm text-text-muted">{plan.description}</p>
               </div>
 
               <div className="mb-8 flex items-end gap-1">
-                <span className="text-5xl font-extrabold text-[#f0f0f0]">{plan.price}</span>
-                <span className="mb-1 text-sm text-[#888]">{plan.period}</span>
+                <span className="text-5xl font-extrabold text-text-primary">{plan.price}</span>
+                <span className="mb-1 text-sm text-text-muted">{plan.period}</span>
               </div>
 
               <ul className="mb-8 flex flex-col gap-3">
                 {plan.features.map((feat) => (
-                  <li key={feat} className="flex items-start gap-2 text-sm text-[#888]">
-                    <span className="mt-0.5 text-[#E8736A]">✓</span>
+                  <li key={feat} className="flex items-start gap-2 text-sm text-text-muted">
+                    <span className="mt-0.5 text-salmon">✓</span>
                     {feat}
                   </li>
                 ))}
@@ -109,8 +109,8 @@ export default function Pricing() {
                 disabled={loading !== null}
                 className={`mt-auto w-full rounded-xl py-3 text-sm font-semibold transition disabled:opacity-60 ${
                   plan.highlight
-                    ? 'bg-[#E8736A] text-white hover:bg-[#F0948D]'
-                    : 'border border-[#2a2a2a] text-[#f0f0f0] hover:border-[#E8736A] hover:text-[#E8736A]'
+                    ? 'bg-salmon text-white hover:bg-salmon-hover'
+                    : 'border border-border text-text-primary hover:border-salmon hover:text-salmon'
                 }`}
               >
                 {loading === plan.id ? 'Redirecting…' : 'Get Started'}
@@ -119,12 +119,9 @@ export default function Pricing() {
           ))}
         </div>
 
-        <p className="mt-8 text-center text-sm text-[#888]">
+        <p className="mt-8 text-center text-sm text-text-muted">
           Not ready to pay?{' '}
-          <button
-            onClick={() => setShowAuth(true)}
-            className="text-[#E8736A] hover:underline"
-          >
+          <button onClick={() => setShowAuth(true)} className="text-salmon hover:underline">
             Sign up for free
           </button>{' '}
           and explore first.

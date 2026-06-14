@@ -5,21 +5,24 @@ const config: Config = {
     './app/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        bg: '#0d0d0d',
-        surface: '#1a1a1a',
-        border: '#2a2a2a',
+        bg: 'var(--bg)',
+        surface: 'var(--surface)',
+        'surface-alt': 'var(--surface-alt)',
+        border: 'var(--border)',
         salmon: {
           DEFAULT: '#E8736A',
           hover: '#F0948D',
           dim: 'rgba(232,115,106,0.15)',
         },
         text: {
-          primary: '#f0f0f0',
-          muted: '#888888',
+          primary: 'var(--text-primary)',
+          muted: 'var(--text-muted)',
         },
+        placeholder: 'var(--placeholder)',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

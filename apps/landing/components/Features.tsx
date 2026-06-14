@@ -41,19 +41,19 @@ export default function Features() {
   return (
     <section id="features" className="mx-auto max-w-6xl px-6 py-28">
       <div className="mb-16 text-center">
-        <h2 className="mb-4 text-4xl font-bold text-[#f0f0f0]">Everything You Need</h2>
-        <p className="text-[#888]">Built for learners who want to make every moment count.</p>
+        <h2 className="mb-4 text-4xl font-bold text-text-primary">Everything You Need</h2>
+        <p className="text-text-muted">Built for learners who want to make every moment count.</p>
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {features.map((f) => (
           <div
             key={f.title}
-            className="rounded-2xl border border-[#2a2a2a] bg-[#1a1a1a] p-7 transition hover:border-[#E8736A]/40 hover:bg-[#1f1f1f]"
+            className="rounded-2xl border border-border bg-surface p-7 transition hover:border-salmon/40 hover:bg-surface-alt"
           >
             <div className="mb-4 text-3xl">{f.icon}</div>
-            <h3 className="mb-2 text-base font-semibold text-[#f0f0f0]">{f.title}</h3>
-            <p className="text-sm leading-relaxed text-[#888]">{f.description}</p>
+            <h3 className="mb-2 text-base font-semibold text-text-primary">{f.title}</h3>
+            <p className="text-sm leading-relaxed text-text-muted">{f.description}</p>
           </div>
         ))}
       </div>
