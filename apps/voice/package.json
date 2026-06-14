@@ -6,13 +6,15 @@
     "dev": "next dev --port 3001",
     "build": "next build",
     "start": "next start --port 3001",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "node --test lib/*.test.mjs"
   },
   "dependencies": {
     "next": "^14.2.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
-    "@anki-convo/lib": "*",
+    "lucide-react": "^0.468.0",
+    "@anki-convo/lib": "workspace:*",
     "@anthropic-ai/sdk": ">=0.40.0",
     "@supabase/supabase-js": "^2.45.0"
   },
