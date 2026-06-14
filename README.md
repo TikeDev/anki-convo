@@ -3,6 +3,8 @@ An AI voice agent client that lets you review and interact with you Anki cards t
 
 Google Doc - https://docs.google.com/document/d/15ioZQSvzYLgLluTZ2r7t8R10qRf5JL60VoKm6BEfUHY/edit?usp=sharing
 
+<img width=80% alt="Screenshot 2026-06-14 at 1 24 01 PM" src="https://github.com/user-attachments/assets/9cc5d7ca-1c01-4fd5-9e40-5fa84eb6701d" />
+
 
 # Anki Voice — Hackathon Team Doc
 **Time: 6 hours | Goal: Working demo we can pitch as a business**
