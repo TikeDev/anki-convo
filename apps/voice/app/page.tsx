@@ -1,6 +1,7 @@
 'use client'
 
 import { FormEvent, useMemo, useState } from 'react'
+import Image from 'next/image'
 import {
   CircleHelp,
   Keyboard,
@@ -92,19 +93,11 @@ export default function Page() {
       <a className="skip-link" href="#review-content">
         Skip to review content
       </a>
-      <div
-        className="ambient-glow"
-        aria-hidden="true"
-        style={{
-          opacity: 0.22 + agent.micLevel * 0.42,
-          transform: `translateX(-50%) scale(${1 + agent.micLevel * 0.18})`,
-        }}
-      />
 
       <header className="app-header" aria-label="Session overview">
         <div className="brand-lockup">
           <span className="app-mark" aria-hidden="true">
-            <Mic size={22} strokeWidth={2.1} />
+            <Image src="/brand/anki-convo-mark.png" alt="" width={30} height={30} priority />
           </span>
           <div>
             <p className="eyebrow">AnkiConvo</p>
@@ -146,6 +139,7 @@ export default function Page() {
 
           <article className="flashcard" aria-labelledby="current-card-title">
             <div className="card-kicker">Front</div>
+            <div className="card-deck">{agent.currentCard.deckName}</div>
             <p className="card-prompt">{agent.currentCard.front}</p>
             <div className="answer-panel" aria-live="polite">
               {agent.currentCard.back ? (
@@ -174,7 +168,7 @@ export default function Page() {
           </div>
         </section>
 
-        <aside className="session-rail" aria-label="Review support">
+        <aside className="session-support" aria-label="Review support">
           <section className="rail-panel" aria-labelledby="progress-title">
             <div className="rail-heading">
               <p className="eyebrow">Session</p>

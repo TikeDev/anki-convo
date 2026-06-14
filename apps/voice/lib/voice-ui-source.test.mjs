@@ -10,12 +10,15 @@ const hookSource = readFileSync(new URL('../lib/use-deepgram-voice-agent.ts', im
 const tokenRouteSource = readFileSync(new URL('../app/api/deepgram-token/route.ts', import.meta.url), 'utf8')
 
 describe('voice review UI source contract', () => {
-  test('uses the compact app workspace layout with icon controls', () => {
+  test('uses the centered Anki Convo review layout with icon controls', () => {
     assert.match(pageSource, /from 'lucide-react'/)
     assert.match(pageSource, /useDeepgramVoiceAgent/)
     assert.match(pageSource, /className="app-workspace"/)
     assert.match(pageSource, /className="session-card"/)
+    assert.match(pageSource, /className="session-support"/)
+    assert.match(pageSource, /\/brand\/anki-convo-mark\.png/)
     assert.match(pageSource, /Start voice session/)
+    assert.doesNotMatch(pageSource, /ambient-glow/)
   })
 
   test('uses the browser Voice Agent hook as the primary session engine', () => {
@@ -48,11 +51,16 @@ describe('voice review UI source contract', () => {
     assert.match(cssSource, /position: fixed;\n  top: 22px;\n  right: 24px;/)
   })
 
-  test('uses reference-inspired design tokens instead of the old theatrical palette', () => {
-    assert.match(cssSource, /--app-bg: #1a1a1e;/)
-    assert.match(cssSource, /--surface: #242428;/)
-    assert.match(cssSource, /--accent: #6b6bff;/)
+  test('uses the Anki Convo navy and cyan design-system tokens', () => {
+    assert.match(cssSource, /--bg: #08111f;/)
+    assert.match(cssSource, /--surface: #102134;/)
+    assert.match(cssSource, /--surface-raised: #19293f;/)
+    assert.match(cssSource, /--accent: #20d0ff;/)
+    assert.match(cssSource, /--brand-lime: #b0f040;/)
+    assert.match(cssSource, /--again: #c0392b;/)
+    assert.match(cssSource, /font-family: var\(--font-sans\);/)
     assert.match(cssSource, /\.app-workspace/)
-    assert.doesNotMatch(cssSource, /--bg: #090b0f;/)
+    assert.doesNotMatch(cssSource, /--accent: #6b6bff;/)
+    assert.doesNotMatch(cssSource, /radial-gradient/)
   })
 })
