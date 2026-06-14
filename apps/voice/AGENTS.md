@@ -4,17 +4,30 @@
 
 `apps/voice` is the voice agent client for AnkiConvo. The target product is a spoken Anki review session: the user answers cards out loud, the agent reveals answers, captures ratings, and syncs progress back through AnkiMCP.
 
-The checked-in code is placeholder Next.js code from another agent. Do not treat the current UI as a design or architecture source of truth. Use `../../docs/VOICE_AGENT_HANDOVER.md` for product intent, then reconcile it with current Deepgram docs before implementing.
+The current app is a browser-demo Deepgram Voice Agent implementation. It captures microphone audio, streams PCM frames to Deepgram, plays binary agent audio, displays card/session state, and handles demo Anki function calls in the browser. The remaining product step is replacing demo Anki functions with server-routed AnkiMCP calls.
 
 ## Current App Shape
 
 - Framework: Next.js 14 App Router, React 18, TypeScript.
 - Entry files: `app/layout.tsx`, `app/page.tsx`.
 - Package name: `@anki-convo/voice`.
-- Local dev script: `pnpm dev` from `apps/voice` if using pnpm, or match the repo's installed package manager until the workspace is cleaned up.
+- Local dev script: `pnpm dev` from `apps/voice`.
 - Default port: `3001`.
+- Primary voice hook: `lib/use-deepgram-voice-agent.ts`.
+- Deepgram settings builder: `lib/deepgram-agent-settings.mjs`.
+- Current demo Anki tool shim: `lib/demo-anki-functions.mjs`.
 
 Confirm before replacing this app with a different stack. The handoff mentions a single `index.html`, but this directory is already a Next app and browser-visible secrets are not acceptable here.
+
+## Related Documentation
+
+| File | Description | When to consult |
+|------|-------------|-----------------|
+| `../../README.md` | Hackathon overview and non-app team context | Understanding demo goals outside `apps/voice` |
+| `../../docs/VOICE_AGENT_HANDOVER.md` | Original voice-agent product handoff | Checking product intent or older STT/TTS fallback ideas |
+| `../../docs/DEEPGRAM_AGENT_NEXT_STEPS_HANDOVER.md` | Deepgram Voice Agent smoke-test handoff | Working on Deepgram Agent integration or smoke testing |
+| `../../docs/ARCHITECTURE_DEMO_TO_PRODUCT.md` | Demo-to-product architecture notes | Moving from shared demo endpoints to production routing |
+| `BROKER_CODE.md` | Broker/API route notes for server-held secrets and MCP URLs | Working on API routes, auth, or AnkiMCP relay code |
 
 ## Target Architecture
 
@@ -25,7 +38,7 @@ Prefer Deepgram's Voice Agent API for the main build unless we intentionally cho
 3. Deepgram Voice Agent uses one WebSocket at `wss://agent.deepgram.com/v1/agent/converse`.
 4. Send a `Settings` message immediately after opening the socket and before audio.
 5. Stream raw audio frames to Deepgram and handle JSON server events plus binary audio output.
-6. Use Deepgram function calling for Anki operations. Client-side function calls should hit server routes that relay to AnkiMCP via `MCP_SERVER_URL`.
+6. Use Deepgram function calling for Anki operations. The current demo handles calls with `executeDemoAnkiFunction`; production/server-backed work should move those calls behind app-owned routes that relay to AnkiMCP via `MCP_SERVER_URL`.
 7. Server-side code owns provider secrets and MCP URLs.
 
 Fallback only if the Voice Agent path blocks the demo: custom Deepgram STT -> Anthropic Messages API with MCP -> Deepgram TTS. If using this fallback, document why in code comments or a short note.
@@ -52,7 +65,7 @@ Important current details:
 
 ## AnkiMCP Contract
 
-The MCP server is expected to expose:
+The real MCP server is expected to expose:
 
 - `sync`
 - `get_due_cards`
@@ -65,6 +78,7 @@ For local demo reliability:
 - Anki Desktop must be open with the AnkiMCP addon installed.
 - `ngrok http 3141` provides the HTTPS MCP URL.
 - Store that value in `MCP_SERVER_URL` on the server only.
+- Until the relay is wired, `lib/demo-anki-functions.mjs` provides local demo decks and simulated tool results.
 
 ## Environment And Secrets
 
