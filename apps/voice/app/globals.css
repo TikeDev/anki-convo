@@ -196,6 +196,21 @@ h2 {
   padding: 78px 24px 104px;
 }
 
+.ambient-glow {
+  position: fixed;
+  left: 50%;
+  bottom: -180px;
+  z-index: 1;
+  width: min(560px, 92vw);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(112, 112, 255, 0.42), rgba(74, 129, 210, 0.16) 42%, transparent 68%);
+  filter: blur(12px);
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
 .global-theme-toggle {
   position: fixed;
   top: 22px;

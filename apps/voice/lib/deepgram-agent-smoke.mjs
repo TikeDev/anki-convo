@@ -1,48 +1,16 @@
-export const DEEPGRAM_AGENT_URL = 'wss://agent.deepgram.com/v1/agent/converse'
+import {
+  createDeepgramAgentSettings as createSharedDeepgramAgentSettings,
+  DEEPGRAM_AGENT_URL,
+} from './deepgram-agent-settings.mjs'
+
+export { DEEPGRAM_AGENT_URL }
 
 const DEFAULT_INJECTED_MESSAGE = 'Say hello in one short sentence.'
 const DEFAULT_TIMEOUT_MS = 12_000
 const DEFAULT_COLLECT_AFTER_INJECT_MS = 4_000
 
 export function createDeepgramAgentSettings() {
-  return {
-    type: 'Settings',
-    audio: {
-      input: {
-        encoding: 'linear16',
-        sample_rate: 24000,
-      },
-      output: {
-        encoding: 'linear16',
-        sample_rate: 24000,
-        container: 'none',
-      },
-    },
-    agent: {
-      language: 'en',
-      listen: {
-        provider: {
-          type: 'deepgram',
-          model: 'nova-3',
-          smart_format: false,
-        },
-      },
-      think: {
-        provider: {
-          type: 'anthropic',
-          model: 'claude-sonnet-4-6',
-          temperature: 0.7,
-        },
-        prompt: 'You are testing a voice agent. Keep replies under one short sentence.',
-      },
-      speak: {
-        provider: {
-          type: 'deepgram',
-          model: 'aura-2-thalia-en',
-        },
-      },
-    },
-  }
+  return createSharedDeepgramAgentSettings({ mode: 'smoke' })
 }
 
 export async function runDeepgramAgentSmoke({
