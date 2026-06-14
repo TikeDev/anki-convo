@@ -100,7 +100,8 @@ curl -sSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc \
 echo "deb https://ngrok-agent.s3.amazonaws.com buster main" \
   | tee /etc/apt/sources.list.d/ngrok.list
 apt-get update -y && apt-get install -y ngrok
-HOME=/root ngrok config add-authtoken ${ngrok_auth_token}echo "ngrok installed and configured"
+HOME=/root ngrok config add-authtoken ${ngrok_auth_token}
+echo "ngrok installed and configured"
 
 # ─── START HEADLESS ANKI CONTAINER ───────────────────────────────────────────
 # Mounts:
@@ -128,7 +129,7 @@ Description=ngrok tunnel for AnkiMCP
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/ngrok http 3141 --log=stdout
+ExecStart=/usr/local/bin/ngrok http 3141 --log=stdout
 Restart=always
 RestartSec=5
 StandardOutput=append:/var/log/ngrok.log

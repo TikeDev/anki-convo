@@ -25,10 +25,14 @@ export default function AuthModal({ initialTab, onClose }: AuthModalProps) {
     setLoading(true)
 
     if (tab === 'signup') {
-      const { error } = await supabase.auth.signUp({ email, password })
+      const { data, error } = await supabase.auth.signUp({ email, password })
       if (error) {
         setError(error.message)
+      } else if (data.session) {
+        // Email confirmation is disabled → user is signed in immediately.
+        onClose()
       } else {
+        // Confirmation required → no session yet.
         setSuccess('Check your email to confirm your account.')
       }
     } else {
