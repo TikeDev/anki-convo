@@ -275,7 +275,7 @@ h2 {
   position: relative;
   min-height: 100svh;
   overflow-x: hidden;
-  padding: 72px 24px 112px;
+  padding: 22px 24px 112px;
 }
 
 .global-theme-toggle {
@@ -290,6 +290,9 @@ h2 {
   background: var(--surface);
   color: var(--text-secondary);
   box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .global-theme-toggle:hover {
