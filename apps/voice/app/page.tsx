@@ -119,7 +119,7 @@ export default function Page() {
       <header className="app-header" aria-label="Session overview">
         <div className="brand-lockup">
           <span className="app-mark" aria-hidden="true">
-            <Image src="/brand/anki-convo-mark.png" alt="" width={30} height={30} priority />
+            <Image src="/brand/anki-convo-mark.png" alt="" width={32} height={30} priority />
           </span>
           <div>
             <p className="eyebrow">AnkiConvo</p>
