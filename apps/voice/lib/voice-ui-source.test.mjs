@@ -18,7 +18,13 @@ describe('voice review UI source contract', () => {
     assert.match(pageSource, /className="session-support"/)
     assert.match(pageSource, /\/brand\/anki-convo-mark\.png/)
     assert.match(pageSource, /Start voice session/)
-    assert.doesNotMatch(pageSource, /ambient-glow/)
+    assert.match(pageSource, /className="ambient-glow"/)
+    assert.match(pageSource, /aria-hidden="true"/)
+    assert.match(pageSource, /agent\.isConnected && !agent\.isMuted \? Math\.min\(agent\.micLevel \* 6, 1\) : 0/)
+    assert.match(pageSource, /'--ambient-shadow-size': `\$\{14 \+ ambientIntensity \* 54\}px`/)
+    assert.match(pageSource, /'--ambient-shadow-color': `rgba\(32, 208, 255, \$\{0\.1 \+ ambientIntensity \* 0\.24\}\)`/)
+    assert.match(pageSource, /ambientIntensity \* 0\.86/)
+    assert.match(pageSource, /ambientIntensity \* 0\.5/)
   })
 
   test('uses the browser Voice Agent hook as the primary session engine', () => {
@@ -53,7 +59,7 @@ describe('voice review UI source contract', () => {
   })
 
   test('preserves session rail spacing without forcing desktop overflow', () => {
-    assert.match(cssSource, /\.rail-heading\s*\{[^}]*margin-bottom: 14px;/s)
+    assert.match(cssSource, /\.rail-heading\s*\{[^}]*margin-bottom: 12px;/s)
     assert.match(cssSource, /\.review-shell\s*\{[^}]*padding: 22px 24px 96px;/s)
     assert.doesNotMatch(cssSource, /\.review-shell\s*\{[^}]*min-height: 100svh;[^}]*padding: 22px 24px 112px;/s)
   })
@@ -108,7 +114,13 @@ describe('voice review UI source contract', () => {
     assert.match(cssSource, /--again: #c0392b;/)
     assert.match(cssSource, /font-family: var\(--font-sans\);/)
     assert.match(cssSource, /\.app-workspace/)
+    assert.match(cssSource, /\.ambient-glow/)
+    assert.match(cssSource, /pointer-events: none;/)
+    assert.match(cssSource, /top: 52%;/)
+    assert.match(cssSource, /width: min\(860px, 132vw\);/)
+    assert.match(cssSource, /0 0 var\(--ambient-shadow-size, 14px\) var\(--ambient-shadow-color, transparent\)/)
+    assert.match(cssSource, /radial-gradient\(circle, color-mix\(in srgb, var\(--accent\)/)
+    assert.match(cssSource, /radial-gradient\(circle at 55% 42%, color-mix\(in srgb, var\(--lime\)/)
     assert.doesNotMatch(cssSource, /--accent: #6b6bff;/)
-    assert.doesNotMatch(cssSource, /radial-gradient/)
   })
 })

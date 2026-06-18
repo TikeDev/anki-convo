@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useMemo, useState } from 'react'
+import { FormEvent, useMemo, useState, type CSSProperties } from 'react'
 import Image from 'next/image'
 import {
   CircleHelp,
@@ -68,6 +68,12 @@ export default function Page() {
   const remainingCards = Math.max(0, agent.currentCard.total - agent.reviewedCount)
   const reviewProgress =
     agent.currentCard.total > 0 ? Math.round((agent.reviewedCount / agent.currentCard.total) * 100) : 0
+  const ambientIntensity = agent.isConnected && !agent.isMuted ? Math.min(agent.micLevel * 6, 1) : 0
+  const ambientStyle = {
+    '--ambient-intensity': ambientIntensity,
+    '--ambient-shadow-size': `${14 + ambientIntensity * 54}px`,
+    '--ambient-shadow-color': `rgba(32, 208, 255, ${0.1 + ambientIntensity * 0.24})`,
+  } as CSSProperties
 
   const deckOptions = useMemo(
     () =>
@@ -96,10 +102,18 @@ export default function Page() {
   }
 
   return (
-    <main className="review-shell">
+    <main className="review-shell" style={ambientStyle}>
       <a className="skip-link" href="#review-content">
         Skip to review content
       </a>
+      <div
+        className="ambient-glow"
+        aria-hidden="true"
+        style={{
+          opacity: ambientIntensity * 0.86,
+          transform: `translate(-50%, -50%) scale(${0.82 + ambientIntensity * 0.5})`,
+        }}
+      />
 
       <header className="app-header" aria-label="Session overview">
         <div className="brand-lockup">
