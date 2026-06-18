@@ -27,6 +27,12 @@ const voiceCommands = [
   'end session',
 ]
 
+function briefTranscriptText(text: string, maxLength = 120) {
+  const compact = text.trim().replace(/\s+/g, ' ')
+  if (compact.length <= maxLength) return compact
+  return `${compact.slice(0, maxLength - 1).trim()}…`
+}
+
 type ControlButtonProps = {
   icon: LucideIcon
   label: string
@@ -58,6 +64,7 @@ export default function Page() {
 
   const latestUser = [...agent.transcript].reverse().find((item) => item.speaker === 'You')
   const latestAgent = [...agent.transcript].reverse().find((item) => item.speaker === 'Agent')
+  const latestUserText = latestUser ? briefTranscriptText(latestUser.text) : 'Waiting for your first answer.'
   const remainingCards = Math.max(0, agent.currentCard.total - agent.reviewedCount)
   const reviewProgress =
     agent.currentCard.total > 0 ? Math.round((agent.reviewedCount / agent.currentCard.total) * 100) : 0
@@ -114,11 +121,11 @@ export default function Page() {
       </header>
 
       <div className="app-workspace">
-        <section className="session-card" id="review-content" aria-labelledby="current-card-title">
+        <section className="session-card" id="review-content" aria-labelledby="active-question-title">
           <div className="session-card-header">
             <div>
-              <p className="eyebrow">Current card</p>
-              <h2 id="current-card-title">{agent.currentCard.front}</h2>
+              <p className="eyebrow">Current question</p>
+              <h2 id="active-question-title">{agent.currentQuestionText}</h2>
             </div>
             <div className="voice-state" aria-live="polite">
               <span className={`status-dot ${agent.isMuted || agent.status === 'error' ? 'muted' : ''}`} aria-hidden="true" />
@@ -137,10 +144,12 @@ export default function Page() {
             <span style={{ width: `${reviewProgress}%` }} />
           </div>
 
-          <article className="flashcard" aria-labelledby="current-card-title">
+          <article className="flashcard" aria-labelledby="active-question-title">
             <div className="card-kicker">Front</div>
             <div className="card-deck">{agent.currentCard.deckName}</div>
-            <p className="card-prompt">{agent.currentCard.front}</p>
+            <div className="question-panel">
+              <p className="card-prompt">{agent.currentQuestionText}</p>
+            </div>
             <div className="answer-panel" aria-live="polite">
               {agent.currentCard.back ? (
                 <>
@@ -155,10 +164,13 @@ export default function Page() {
 
           <div className="review-feedback" aria-live="polite">
             {agent.error ? <p className="notice">{agent.error}</p> : null}
+            {agent.lastCommittedRating ? (
+              <p className="rating-notice">Last rating: {agent.lastCommittedRating.ratingLabel}</p>
+            ) : null}
             <div className="caption-strip" aria-label="Latest transcript">
               <p>
                 <strong>You</strong>
-                <span>{latestUser?.text ?? 'Waiting for your first answer.'}</span>
+                <span>{latestUserText}</span>
               </p>
               <p>
                 <strong>Agent</strong>

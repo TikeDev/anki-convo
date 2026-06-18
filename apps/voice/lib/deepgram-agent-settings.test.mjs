@@ -26,6 +26,9 @@ test('browser demo settings use Flux v2 with managed Anthropic, Aura 2, and demo
   assert.equal(settings.agent.speak.provider.type, 'deepgram')
   assert.equal(settings.agent.speak.provider.model, 'aura-2-thalia-en')
   assert.match(settings.agent.think.prompt, /Anki flashcard review assistant/)
+  assert.match(settings.agent.think.prompt, /call rate_card immediately/i)
+  assert.match(settings.agent.think.prompt, /corrections/i)
+  assert.doesNotMatch(settings.agent.think.prompt, /ask for Again, Hard, Good, or Easy/i)
   assert.equal(settings.agent.greeting, 'Ready for Anki review. Say which deck you want to study.')
 
   const functions = settings.agent.think.functions

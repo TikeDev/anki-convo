@@ -26,7 +26,16 @@ describe('voice review UI source contract', () => {
     assert.match(hookSource, /new WebSocket\(DEEPGRAM_AGENT_URL,/)
     assert.match(hookSource, /Sec-WebSocket-Protocol/)
     assert.match(hookSource, /executeDemoAnkiFunction/)
+    assert.match(hookSource, /currentQuestionText/)
+    assert.match(hookSource, /lastCommittedRating/)
     assert.doesNotMatch(pageSource, /reviewSessionReducer/)
+  })
+
+  test('renders the active card question from authoritative card state', () => {
+    assert.match(pageSource, /agent\.currentQuestionText/)
+    assert.match(pageSource, /className="question-panel"/)
+    assert.match(pageSource, /aria-labelledby="active-question-title"/)
+    assert.doesNotMatch(pageSource, /<h2 id="current-card-title">\{agent\.currentCard\.front\}<\/h2>/)
   })
 
   test('keeps Deepgram long-lived keys out of client code', () => {

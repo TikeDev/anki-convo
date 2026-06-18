@@ -13,6 +13,9 @@ type AgentStatus =
   | 'listening'
   | 'user-speaking'
   | 'thinking'
+  | 'rating'
+  | 'rated'
+  | 'next-card'
   | 'speaking'
   | 'muted'
   | 'error'
@@ -33,6 +36,12 @@ type ReviewCard = {
   back?: string
   position: number
   total: number
+}
+
+type LastCommittedRating = {
+  cardId: string
+  rating: string
+  ratingLabel: string
 }
 
 type AudioDevice = {
@@ -89,6 +98,12 @@ function statusLabel(status: AgentStatus) {
       return 'Got it'
     case 'thinking':
       return 'Thinking'
+    case 'rating':
+      return 'Rating'
+    case 'rated':
+      return 'Rated'
+    case 'next-card':
+      return 'Next card'
     case 'speaking':
       return 'Speaking'
     case 'muted':
@@ -111,6 +126,7 @@ export function useDeepgramVoiceAgent() {
   ])
   const [currentCard, setCurrentCard] = useState<ReviewCard>(createInitialCard)
   const [reviewedCount, setReviewedCount] = useState(0)
+  const [lastCommittedRating, setLastCommittedRating] = useState<LastCommittedRating | null>(null)
   const [isMuted, setIsMuted] = useState(false)
   const [isConnected, setIsConnected] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -132,6 +148,8 @@ export function useDeepgramVoiceAgent() {
   const mutedRef = useRef(false)
   const playbackTimeRef = useRef(0)
   const transcriptCounterRef = useRef(2)
+  const currentCardRef = useRef<ReviewCard>(createInitialCard())
+  const lastCommittedRatingRef = useRef<LastCommittedRating | null>(null)
 
   const appendTranscript = useCallback((speaker: TranscriptEntry['speaker'], text: string) => {
     if (!text.trim()) return
@@ -217,16 +235,23 @@ export function useDeepgramVoiceAgent() {
     }
   }, [])
 
+  const commitCurrentCard = useCallback((card: ReviewCard) => {
+    currentCardRef.current = card
+    setCurrentCard(card)
+  }, [])
+
   const updateCardFromResult = useCallback((name: string, result: Record<string, unknown>) => {
     if (name === 'get_due_cards' && Array.isArray(result.cards) && result.cards.length > 0) {
       const card = result.cards[0] as { id?: string; front?: string; position?: number; total?: number }
-      setCurrentCard((previous) => ({
+      const previous = currentCardRef.current
+      commitCurrentCard({
         ...previous,
         id: String(card.id ?? previous.id),
         front: String(card.front ?? previous.front),
+        back: undefined,
         position: Number(card.position ?? previous.position),
         total: Number(card.total ?? previous.total),
-      }))
+      })
     }
 
     if (name === 'present_card' && typeof result.card === 'object' && result.card) {
@@ -238,7 +263,7 @@ export function useDeepgramVoiceAgent() {
         position?: number
         total?: number
       }
-      setCurrentCard({
+      commitCurrentCard({
         id: String(card.id ?? ''),
         deckName: String(card.deck_name ?? 'Demo'),
         front: String(card.front ?? ''),
@@ -249,9 +274,37 @@ export function useDeepgramVoiceAgent() {
     }
 
     if (name === 'rate_card' && result.ok === true) {
-      setReviewedCount((count) => count + 1)
+      const current = currentCardRef.current
+      const cardId = String(result.card_id ?? current.id)
+      const ratingLabel = String(result.rating_label ?? result.rating ?? 'Rated')
+      const committedRating = {
+        cardId,
+        rating: String(result.rating ?? ratingLabel),
+        ratingLabel,
+      }
+      const isCorrection = lastCommittedRatingRef.current?.cardId === cardId
+      lastCommittedRatingRef.current = committedRating
+      setLastCommittedRating(committedRating)
+      if (!isCorrection) {
+        setReviewedCount((count) => count + 1)
+      }
+
+      const nextCard = findDemoCard(String(result.next_card_id ?? ''))
+      if (nextCard) {
+        commitCurrentCard({
+          id: nextCard.card.id,
+          deckName: nextCard.deck.name,
+          front: nextCard.card.front,
+          back: undefined,
+          position: nextCard.index + 1,
+          total: nextCard.deck.cards.length,
+        })
+        setStatus('next-card')
+      } else {
+        setStatus('rated')
+      }
     }
-  }, [])
+  }, [commitCurrentCard])
 
   const handleFunctionCall = useCallback(
     async (event: DeepgramEvent) => {
@@ -259,6 +312,7 @@ export function useDeepgramVoiceAgent() {
       for (const fn of functions) {
         const name = fn.name ?? ''
         const args = parseFunctionArgs(fn.arguments ?? fn.input)
+        setStatus(name === 'rate_card' ? 'rating' : 'thinking')
         const result = await executeDemoAnkiFunction(name, args)
         updateCardFromResult(name, result)
         sendJson({
@@ -504,7 +558,9 @@ export function useDeepgramVoiceAgent() {
     statusLabel: statusLabel(status),
     transcript,
     currentCard,
+    currentQuestionText: currentCard.front || 'Waiting for the next card.',
     reviewedCount,
+    lastCommittedRating,
     isMuted,
     isConnected,
     error,
@@ -535,6 +591,21 @@ function parseFunctionArgs(value: unknown) {
   }
   if (typeof value === 'object') return value as Record<string, unknown>
   return {}
+}
+
+function findDemoCard(cardId: string) {
+  if (!cardId) return null
+  for (const deck of demoDecks) {
+    const index = deck.cards.findIndex((card) => card.id === cardId)
+    if (index !== -1) {
+      return {
+        deck,
+        card: deck.cards[index],
+        index,
+      }
+    }
+  }
+  return null
 }
 
 declare global {
