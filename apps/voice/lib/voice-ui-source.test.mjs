@@ -52,6 +52,25 @@ describe('voice review UI source contract', () => {
     assert.doesNotMatch(pageSource, /className="text-drawer"/)
   })
 
+  test('keeps voice commands under the Help control', () => {
+    assert.match(pageSource, /CircleHelp/)
+    assert.match(pageSource, /helpOpen/)
+    assert.match(pageSource, /Voice commands/)
+    assert.match(pageSource, /command-overlay/)
+    assert.match(pageSource, /label="Help"/)
+  })
+
+  test('does not render the always-visible say or tap commands rail', () => {
+    assert.doesNotMatch(pageSource, /id="quick-title"/)
+    assert.doesNotMatch(pageSource, /Say or tap/)
+    assert.doesNotMatch(pageSource, /aria-labelledby="quick-title"/)
+  })
+
+  test('idle voice state tells the user to click Start', () => {
+    assert.match(hookSource, /return 'Click Start'/)
+    assert.doesNotMatch(hookSource, /return 'Start talking'/)
+  })
+
   test('keeps the theme toggle global and fixed in the upper right', () => {
     assert.match(layoutSource, /<ThemeToggle \/>/)
     assert.match(themeToggleSource, /className="global-theme-toggle"/)

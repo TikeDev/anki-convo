@@ -19,12 +19,12 @@ import { demoDecks } from '@/lib/demo-anki-functions.mjs'
 import { useDeepgramVoiceAgent } from '@/lib/use-deepgram-voice-agent'
 
 const voiceCommands = [
-  'start Anki review',
-  'review Spanish',
-  'reveal answer',
-  'again / hard / good / easy',
-  'sync now',
-  'end session',
+  '"start Anki review"',
+  '"review Spanish"',
+  '"reveal answer"',
+  '"again / hard / good / easy"',
+  '"sync now"',
+  '"end session"',
 ]
 
 function briefTranscriptText(text: string, maxLength = 120) {
@@ -202,19 +202,6 @@ export default function Page() {
                 </dd>
               </div>
             </dl>
-          </section>
-
-          <section className="rail-panel" aria-labelledby="quick-title">
-            <div className="rail-heading">
-              <p className="eyebrow">Commands</p>
-              <h2 id="quick-title">Say or tap</h2>
-            </div>
-            <ul className="command-list">
-              <li>start Anki review</li>
-              <li>review Spanish</li>
-              <li>again, hard, good, easy</li>
-              <li>sync now</li>
-            </ul>
           </section>
         </aside>
       </div>

@@ -606,7 +606,7 @@ h1 {
 
 .session-support {
   display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
 }
 

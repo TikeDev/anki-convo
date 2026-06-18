@@ -89,7 +89,7 @@ function createInitialCard(): ReviewCard {
 function statusLabel(status: AgentStatus) {
   switch (status) {
     case 'idle':
-      return 'Start talking'
+      return 'Click Start'
     case 'connecting':
       return 'Connecting'
     case 'listening':
