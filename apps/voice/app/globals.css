@@ -296,6 +296,13 @@ h2 {
     transform 0.08s linear;
 }
 
+:root[data-theme="light"] .ambient-glow {
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--accent) 88%, transparent), transparent 54%),
+    radial-gradient(circle at 55% 42%, color-mix(in srgb, var(--lime) 58%, transparent), transparent 42%);
+  filter: blur(18px) saturate(1.18);
+}
+
 .global-theme-toggle {
   position: fixed;
   top: 22px;
@@ -425,6 +432,13 @@ h1 {
   box-shadow:
     var(--shadow-md),
     0 0 var(--ambient-shadow-size, 14px) var(--ambient-shadow-color, transparent);
+}
+
+:root[data-theme="light"] .session-card {
+  box-shadow:
+    var(--shadow-md),
+    0 0 calc(var(--ambient-shadow-size, 14px) * 1.25) rgb(0 156 206 / calc(var(--ambient-shadow-opacity, 0) * 1.35)),
+    0 0 calc(var(--ambient-shadow-size, 14px) * 0.62) rgb(124 174 28 / calc(var(--ambient-shadow-opacity, 0) * 0.58));
 }
 
 .session-card-header,

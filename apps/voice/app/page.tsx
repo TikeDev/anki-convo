@@ -73,6 +73,7 @@ export default function Page() {
     '--ambient-intensity': ambientIntensity,
     '--ambient-shadow-size': `${14 + ambientIntensity * 54}px`,
     '--ambient-shadow-color': `rgba(32, 208, 255, ${0.1 + ambientIntensity * 0.24})`,
+    '--ambient-shadow-opacity': 0.12 + ambientIntensity * 0.3,
   } as CSSProperties
 
   const deckOptions = useMemo(

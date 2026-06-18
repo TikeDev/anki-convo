@@ -148,6 +148,7 @@ export function useDeepgramVoiceAgent() {
   const settingsAppliedRef = useRef(false)
   const mutedRef = useRef(false)
   const playbackTimeRef = useRef(0)
+  const playbackSourcesRef = useRef<Set<AudioBufferSourceNode>>(new Set())
   const transcriptCounterRef = useRef(2)
   const currentCardRef = useRef<ReviewCard>(createInitialCard())
   const lastCommittedRatingRef = useRef<LastCommittedRating | null>(null)
@@ -201,14 +202,28 @@ export function useDeepgramVoiceAgent() {
     setMicLevel(0)
   }, [])
 
+  const stopPlayback = useCallback(() => {
+    playbackSourcesRef.current.forEach((source) => {
+      try {
+        source.stop()
+      } catch {
+        // Already-ended buffer sources throw if stopped again.
+      }
+      source.disconnect()
+    })
+    playbackSourcesRef.current.clear()
+    playbackTimeRef.current = 0
+  }, [])
+
   const disconnect = useCallback(() => {
     settingsAppliedRef.current = false
+    stopPlayback()
     socketRef.current?.close()
     socketRef.current = null
     stopAudio()
     setIsConnected(false)
     setStatus('ended')
-  }, [stopAudio])
+  }, [stopAudio, stopPlayback])
 
   const playPcmAudio = useCallback((buffer: ArrayBuffer) => {
     const context = audioContextRef.current
@@ -224,6 +239,10 @@ export function useDeepgramVoiceAgent() {
     const source = context.createBufferSource()
     source.buffer = audioBuffer
     source.connect(context.destination)
+    playbackSourcesRef.current.add(source)
+    source.onended = () => {
+      playbackSourcesRef.current.delete(source)
+    }
     const startAt = Math.max(context.currentTime, playbackTimeRef.current)
     source.start(startAt)
     playbackTimeRef.current = startAt + audioBuffer.duration
@@ -558,11 +577,12 @@ export function useDeepgramVoiceAgent() {
   useEffect(() => {
     void refreshDevices()
     return () => {
+      stopPlayback()
       socketRef.current?.close()
       stopAudio()
       void audioContextRef.current?.close()
     }
-  }, [refreshDevices, stopAudio])
+  }, [refreshDevices, stopAudio, stopPlayback])
 
   return {
     status,
