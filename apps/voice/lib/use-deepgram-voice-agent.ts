@@ -127,6 +127,7 @@ export function useDeepgramVoiceAgent() {
   const [currentCard, setCurrentCard] = useState<ReviewCard>(createInitialCard)
   const [reviewedCount, setReviewedCount] = useState(0)
   const [lastCommittedRating, setLastCommittedRating] = useState<LastCommittedRating | null>(null)
+  const [isAnswerVisible, setIsAnswerVisible] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
   const [isConnected, setIsConnected] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -236,6 +237,9 @@ export function useDeepgramVoiceAgent() {
   }, [])
 
   const commitCurrentCard = useCallback((card: ReviewCard) => {
+    if (currentCardRef.current.id !== card.id) {
+      setIsAnswerVisible(false)
+    }
     currentCardRef.current = card
     setCurrentCard(card)
   }, [])
@@ -506,10 +510,17 @@ export function useDeepgramVoiceAgent() {
     }
   }, [])
 
+  const revealAnswer = useCallback(() => {
+    setIsAnswerVisible(true)
+  }, [])
+
   const injectText = useCallback(
     (text: string) => {
       const trimmed = text.trim()
       if (!trimmed) return
+      if (isRevealCommand(trimmed)) {
+        revealAnswer()
+      }
       appendTranscript('You', trimmed)
       if (socketRef.current?.readyState === WebSocket.OPEN) {
         sendJson({ type: 'InjectUserMessage', content: trimmed })
@@ -518,7 +529,7 @@ export function useDeepgramVoiceAgent() {
         appendTranscript('Agent', 'Connect voice mode to send this to the agent.')
       }
     },
-    [appendTranscript, sendJson],
+    [appendTranscript, revealAnswer, sendJson],
   )
 
   const setSelectedInput = useCallback((deviceId: string) => {
@@ -561,6 +572,7 @@ export function useDeepgramVoiceAgent() {
     currentQuestionText: currentCard.front || 'Waiting for the next card.',
     reviewedCount,
     lastCommittedRating,
+    isAnswerVisible,
     isMuted,
     isConnected,
     error,
@@ -573,11 +585,16 @@ export function useDeepgramVoiceAgent() {
     connect,
     disconnect,
     toggleMute,
+    revealAnswer,
     setVoiceMode,
     injectText,
     setSelectedInput,
     setSelectedOutput,
   }
+}
+
+function isRevealCommand(text: string) {
+  return /^reveal(?: the)? answer$/i.test(text.trim())
 }
 
 function parseFunctionArgs(value: unknown) {

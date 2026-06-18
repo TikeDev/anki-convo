@@ -151,13 +151,13 @@ export default function Page() {
               <p className="card-prompt">{agent.currentQuestionText}</p>
             </div>
             <div className="answer-panel" aria-live="polite">
-              {agent.currentCard.back ? (
+              {agent.isAnswerVisible && agent.currentCard.back ? (
                 <>
                   <span>Answer</span>
                   <p>{agent.currentCard.back}</p>
                 </>
               ) : (
-                <p>Answer aloud, type a response, or say &quot;reveal answer&quot;.</p>
+                <p>Answer aloud, then reveal when ready.</p>
               )}
             </div>
           </article>
@@ -181,10 +181,9 @@ export default function Page() {
         </section>
 
         <aside className="session-support" aria-label="Review support">
-          <section className="rail-panel" aria-labelledby="progress-title">
+          <section className="rail-panel" aria-label="Session progress">
             <div className="rail-heading">
               <p className="eyebrow">Session</p>
-              <h2 id="progress-title">Progress</h2>
             </div>
             <dl className="metric-list">
               <div>
@@ -196,7 +195,7 @@ export default function Page() {
                 <dd>{remainingCards}</dd>
               </div>
               <div>
-                <dt>Card</dt>
+                <dt>Progress</dt>
                 <dd>
                   {agent.currentCard.position}/{agent.currentCard.total}
                 </dd>
@@ -347,7 +346,14 @@ export default function Page() {
               </option>
               {deckOptions}
             </select>
-            <button type="button" className="secondary-button" onClick={() => agent.injectText('reveal answer')}>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => {
+                agent.revealAnswer()
+                agent.injectText('reveal answer')
+              }}
+            >
               Reveal answer
             </button>
           </div>

@@ -275,7 +275,7 @@ h2 {
   position: relative;
   min-height: 100svh;
   overflow-x: hidden;
-  padding: 22px 24px 112px;
+  padding: 22px 24px 96px;
 }
 
 .global-theme-toggle {
@@ -350,7 +350,7 @@ h2 {
 .eyebrow {
   margin: 0 0 3px;
   color: var(--text-muted);
-  font-size: var(--text-2xs);
+  font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-caps);
   line-height: 1.2;
@@ -413,6 +413,10 @@ h1 {
   align-items: flex-start;
   justify-content: space-between;
   gap: 14px;
+}
+
+.rail-heading {
+  margin-bottom: 12px;
 }
 
 .session-card h2 {
@@ -487,7 +491,7 @@ h1 {
 .card-deck,
 .answer-panel span {
   color: var(--text-muted);
-  font-size: var(--text-2xs);
+  font-size: var(--text-base);
   font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-caps);
   line-height: 1.2;
@@ -592,7 +596,7 @@ h1 {
   display: block;
   margin-bottom: 5px;
   color: var(--text-muted);
-  font-size: var(--text-2xs);
+  font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;

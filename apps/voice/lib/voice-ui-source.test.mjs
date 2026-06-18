@@ -38,6 +38,26 @@ describe('voice review UI source contract', () => {
     assert.doesNotMatch(pageSource, /<h2 id="current-card-title">\{agent\.currentCard\.front\}<\/h2>/)
   })
 
+  test('keeps answer content hidden until explicit reveal', () => {
+    assert.match(hookSource, /isAnswerVisible/)
+    assert.match(hookSource, /revealAnswer/)
+    assert.match(pageSource, /agent\.isAnswerVisible && agent\.currentCard\.back/)
+    assert.doesNotMatch(pageSource, /\{agent\.currentCard\.back \? \(/)
+  })
+
+  test('uses progress as the position metric without a duplicate progress heading', () => {
+    assert.match(pageSource, /aria-label="Session progress"/)
+    assert.match(pageSource, /<dt>Progress<\/dt>/)
+    assert.doesNotMatch(pageSource, /id="progress-title"/)
+    assert.doesNotMatch(pageSource, /<dt>Card<\/dt>/)
+  })
+
+  test('preserves session rail spacing without forcing desktop overflow', () => {
+    assert.match(cssSource, /\.rail-heading\s*\{[^}]*margin-bottom: 14px;/s)
+    assert.match(cssSource, /\.review-shell\s*\{[^}]*padding: 22px 24px 96px;/s)
+    assert.doesNotMatch(cssSource, /\.review-shell\s*\{[^}]*min-height: 100svh;[^}]*padding: 22px 24px 112px;/s)
+  })
+
   test('keeps Deepgram long-lived keys out of client code', () => {
     assert.doesNotMatch(pageSource, /DEEPGRAM_API_KEY/)
     assert.doesNotMatch(hookSource, /DEEPGRAM_API_KEY/)
