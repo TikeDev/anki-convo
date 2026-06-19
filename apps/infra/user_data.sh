@@ -124,6 +124,16 @@ echo "headless-anki container started"
 # ─── START NGROK AS SYSTEMD SERVICE ──────────────────────────────────────────
 # Runs ngrok as a persistent background service that survives reboots.
 # The public HTTPS URL is written to /opt/ngrok-url.txt on startup.
+mkdir -p /etc/ngrok
+cat > /etc/ngrok/anki-mcp-policy.yml << 'POLICY'
+on_http_request:
+  - actions:
+      - type: add-headers
+        config:
+          headers:
+            host: "localhost:3141"
+POLICY
+
 cat > /etc/systemd/system/ngrok.service << 'UNIT'
 [Unit]
 Description=ngrok tunnel for AnkiMCP
@@ -131,7 +141,7 @@ After=network.target
 
 [Service]
 Environment=HOME=/root
-ExecStart=/usr/local/bin/ngrok http 3141 --url=${ngrok_domain} --log=stdout
+ExecStart=/usr/local/bin/ngrok http 3141 --url=${ngrok_domain} --traffic-policy-file /etc/ngrok/anki-mcp-policy.yml --log=stdout
 Restart=always
 RestartSec=5
 StandardOutput=append:/var/log/ngrok.log
