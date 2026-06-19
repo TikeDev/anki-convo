@@ -8,6 +8,7 @@ ANKI_SYNC_KEY="${anki_sync_key}"
 ANKI_PROFILE_NAME="${anki_profile_name}"
 NGROK_AUTH_TOKEN="${ngrok_auth_token}"
 ANKI_DATA_DIR="/opt/anki-data"
+NGROK_DOMAIN="${ngrok_domain}"
 
 # ─── SYSTEM SETUP ────────────────────────────────────────────────────────────
 apt-get update -y
@@ -129,7 +130,8 @@ Description=ngrok tunnel for AnkiMCP
 After=network.target
 
 [Service]
-ExecStart=/usr/local/bin/ngrok http 3141 --log=stdout
+Environment=HOME=/root
+ExecStart=/usr/local/bin/ngrok http 3141 --url=${ngrok_domain} --log=stdout
 Restart=always
 RestartSec=5
 StandardOutput=append:/var/log/ngrok.log

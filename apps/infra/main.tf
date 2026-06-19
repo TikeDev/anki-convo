@@ -99,6 +99,7 @@ resource "aws_instance" "anki_mcp" {
     anki_sync_key     = var.anki_sync_key
     anki_profile_name = var.anki_profile_name
     ngrok_auth_token  = var.ngrok_auth_token
+    ngrok_domain      = var.ngrok_domain
   })
 
   root_block_device {

@@ -39,3 +39,13 @@ variable "ngrok_auth_token" {
   type        = string
   sensitive   = true
 }
+
+variable "ngrok_domain" {
+  description = "Stable ngrok HTTPS domain, e.g. https://abc.ngrok-free.app"
+  type        = string
+
+  validation {
+    condition     = startswith(var.ngrok_domain, "https://")
+    error_message = "ngrok_domain must start with https://"
+  }
+}
