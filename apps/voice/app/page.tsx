@@ -64,22 +64,54 @@ export default function Page() {
   const helpOpen = activeOverlay === 'help'
   const settingsOpen = activeOverlay === 'settings'
   const bottomControlsRef = useRef<HTMLElement>(null)
+  const overlayPanelRef = useRef<HTMLElement>(null)
+  const overlayTriggerRef = useRef<HTMLElement | null>(null)
 
   const closeOverlay = useCallback(() => setActiveOverlay(null), [])
-  const toggleOverlay = useCallback(
-    (overlay: 'text' | 'help' | 'settings') =>
-      setActiveOverlay((current) => (current === overlay ? null : overlay)),
-    [],
-  )
+  const toggleOverlay = useCallback((overlay: 'text' | 'help' | 'settings') => {
+    overlayTriggerRef.current = document.activeElement as HTMLElement | null
+    setActiveOverlay((current) => (current === overlay ? null : overlay))
+  }, [])
 
   useEffect(() => {
     if (!activeOverlay) return
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') closeOverlay()
+      if (event.key === 'Escape') {
+        closeOverlay()
+        return
+      }
+      if (event.key !== 'Tab') return
+      const panel = overlayPanelRef.current
+      if (!panel) return
+      const focusable = panel.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      )
+      if (focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [activeOverlay, closeOverlay])
+
+  useEffect(() => {
+    if (!activeOverlay) return
+    const panel = overlayPanelRef.current
+    const focusable = panel?.querySelector<HTMLElement>(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    )
+    focusable?.focus()
+    return () => {
+      overlayTriggerRef.current?.focus()
+    }
+  }, [activeOverlay])
 
   useEffect(() => {
     const node = bottomControlsRef.current
@@ -175,7 +207,7 @@ export default function Page() {
             </div>
             <div className="voice-state" aria-live="polite">
               <span className={`status-dot ${agent.isMuted || agent.status === 'error' ? 'muted' : ''}`} aria-hidden="true" />
-              <span>{agent.error ?? agent.statusLabel}</span>
+              <span>{agent.statusLabel}</span>
             </div>
           </div>
 
@@ -209,7 +241,14 @@ export default function Page() {
           </article>
 
           <div className="review-feedback" aria-live="polite">
-            {agent.error ? <p className="notice">{agent.error}</p> : null}
+            {agent.error ? (
+              <p className="notice">
+                <span>{agent.error}</span>
+                <button type="button" className="notice-retry" onClick={() => void agent.connect()}>
+                  Retry
+                </button>
+              </p>
+            ) : null}
             {agent.lastCommittedRating ? (
               <p className="rating-notice">Last rating: {agent.lastCommittedRating.ratingLabel}</p>
             ) : null}
@@ -254,7 +293,13 @@ export default function Page() {
       {activeOverlay ? <div className="overlay-backdrop" aria-hidden="true" onClick={closeOverlay} /> : null}
 
       {helpOpen ? (
-        <section className="floating-panel command-overlay" aria-labelledby="command-title">
+        <section
+          className="floating-panel command-overlay"
+          aria-labelledby="command-title"
+          role="dialog"
+          aria-modal="true"
+          ref={overlayPanelRef}
+        >
           <div className="panel-header">
             <div>
               <p className="eyebrow">Say help</p>
@@ -278,7 +323,13 @@ export default function Page() {
       ) : null}
 
       {settingsOpen ? (
-        <section className="floating-panel settings-panel" aria-labelledby="settings-title">
+        <section
+          className="floating-panel settings-panel"
+          aria-labelledby="settings-title"
+          role="dialog"
+          aria-modal="true"
+          ref={overlayPanelRef}
+        >
           <div className="panel-header">
             <div>
               <p className="eyebrow">Session</p>
@@ -294,9 +345,11 @@ export default function Page() {
             </button>
           </div>
           <div className="settings-grid">
-            <label>
+            <label htmlFor="voice-mode-select">
               <span>Voice mode</span>
               <select
+                id="voice-mode-select"
+                name="voiceMode"
                 value={agent.voiceMode}
                 onChange={(event) => agent.setVoiceMode(event.target.value === 'push-to-talk' ? 'push-to-talk' : 'free-talk')}
               >
@@ -304,9 +357,14 @@ export default function Page() {
                 <option value="push-to-talk">Push to talk</option>
               </select>
             </label>
-            <label>
+            <label htmlFor="microphone-select">
               <span>Microphone</span>
-              <select value={agent.selectedInputDeviceId} onChange={(event) => agent.setSelectedInput(event.target.value)}>
+              <select
+                id="microphone-select"
+                name="microphone"
+                value={agent.selectedInputDeviceId}
+                onChange={(event) => agent.setSelectedInput(event.target.value)}
+              >
                 <option value="">System microphone</option>
                 {agent.inputDevices.map((device) => (
                   <option key={device.deviceId} value={device.deviceId}>
@@ -315,9 +373,14 @@ export default function Page() {
                 ))}
               </select>
             </label>
-            <label>
+            <label htmlFor="speaker-select">
               <span>Speaker</span>
-              <select value={agent.selectedOutputDeviceId} onChange={(event) => agent.setSelectedOutput(event.target.value)}>
+              <select
+                id="speaker-select"
+                name="speaker"
+                value={agent.selectedOutputDeviceId}
+                onChange={(event) => agent.setSelectedOutput(event.target.value)}
+              >
                 <option value="">System default</option>
                 {agent.outputDevices.map((device) => (
                   <option key={device.deviceId} value={device.deviceId}>
@@ -359,7 +422,7 @@ export default function Page() {
                   : 'Mute microphone'
                 : 'Start voice session'
           }
-          aria-pressed={agent.isMuted}
+          aria-pressed={agent.isConnected ? agent.isMuted : undefined}
           aria-busy={agent.isConnecting}
           disabled={agent.isConnecting}
           onClick={togglePrimaryMic}
@@ -380,7 +443,13 @@ export default function Page() {
       </nav>
 
       {textModeOpen ? (
-        <section className="support-drawer" aria-labelledby="text-mode-title">
+        <section
+          className="support-drawer"
+          aria-labelledby="text-mode-title"
+          role="dialog"
+          aria-modal="true"
+          ref={overlayPanelRef}
+        >
           <div className="panel-header">
             <div>
               <p className="eyebrow">Fallback mode</p>

@@ -643,6 +643,29 @@ h1 {
   font-weight: var(--weight-semibold);
 }
 
+.notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.notice-retry {
+  flex: 0 0 auto;
+  min-height: 28px;
+  border-color: var(--accent-soft-border);
+  background: transparent;
+  color: var(--voice-text);
+  padding: 0 12px;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.notice-retry:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft-hover);
+}
+
 .caption-strip {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
