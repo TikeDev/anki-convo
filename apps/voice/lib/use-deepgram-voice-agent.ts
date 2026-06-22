@@ -396,19 +396,25 @@ export function useDeepgramVoiceAgent() {
 
   const startAudio = useCallback(async () => {
     stopAudio()
-    const constraints: MediaStreamConstraints = {
-      audio: selectedInputDeviceId
-        ? {
-            deviceId: { exact: selectedInputDeviceId },
-            echoCancellation: true,
-            noiseSuppression: true,
-          }
-        : {
-            echoCancellation: true,
-            noiseSuppression: true,
-          },
+    const baseAudioConstraints = {
+      echoCancellation: true,
+      noiseSuppression: true,
     }
-    const stream = await navigator.mediaDevices.getUserMedia(constraints)
+    let stream: MediaStream
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          deviceId: { exact: selectedInputDeviceId || 'default' },
+          ...baseAudioConstraints,
+        },
+      })
+    } catch (err) {
+      // Some browsers (Firefox, Safari) don't expose the 'default' device id
+      // sentinel and throw OverconstrainedError; fall back to an unconstrained
+      // request, but only when we weren't asking for a specific user-picked device.
+      if (selectedInputDeviceId || !(err instanceof OverconstrainedError)) throw err
+      stream = await navigator.mediaDevices.getUserMedia({ audio: baseAudioConstraints })
+    }
     streamRef.current = stream
 
     const AudioContextCtor = window.AudioContext || window.webkitAudioContext
@@ -552,9 +558,15 @@ export function useDeepgramVoiceAgent() {
     [appendTranscript, revealAnswer, sendJson],
   )
 
-  const setSelectedInput = useCallback((deviceId: string) => {
-    setSelectedInputDeviceId(deviceId)
-  }, [])
+  const setSelectedInput = useCallback(
+    (deviceId: string) => {
+      setSelectedInputDeviceId(deviceId)
+      if (streamRef.current) {
+        void startAudio()
+      }
+    },
+    [startAudio],
+  )
 
   const setSelectedOutput = useCallback((deviceId: string) => {
     setSelectedOutputDeviceId(deviceId)
