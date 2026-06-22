@@ -66,6 +66,8 @@ export default function Page() {
   const bottomControlsRef = useRef<HTMLElement>(null)
   const overlayPanelRef = useRef<HTMLElement>(null)
   const overlayTriggerRef = useRef<HTMLElement | null>(null)
+  const [endArmed, setEndArmed] = useState(false)
+  const endArmTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const closeOverlay = useCallback(() => setActiveOverlay(null), [])
   const toggleOverlay = useCallback((overlay: 'text' | 'help' | 'settings') => {
@@ -123,6 +125,28 @@ export default function Page() {
     observer.observe(node)
     return () => observer.disconnect()
   }, [])
+
+  useEffect(() => {
+    return () => {
+      if (endArmTimeoutRef.current) clearTimeout(endArmTimeoutRef.current)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!agent.isConnected) setEndArmed(false)
+  }, [agent.isConnected])
+
+  const handleEndClick = useCallback(() => {
+    if (!endArmed) {
+      setEndArmed(true)
+      if (endArmTimeoutRef.current) clearTimeout(endArmTimeoutRef.current)
+      endArmTimeoutRef.current = setTimeout(() => setEndArmed(false), 3000)
+      return
+    }
+    if (endArmTimeoutRef.current) clearTimeout(endArmTimeoutRef.current)
+    setEndArmed(false)
+    agent.disconnect()
+  }, [endArmed, agent])
 
   const latestUser = [...agent.transcript].reverse().find((item) => item.speaker === 'You')
   const latestAgent = [...agent.transcript].reverse().find((item) => item.speaker === 'Agent')
@@ -439,7 +463,16 @@ export default function Page() {
           </span>
         </button>
         <ControlButton icon={CircleHelp} label="Help" pressed={helpOpen} onClick={() => toggleOverlay('help')} />
-        <ControlButton icon={LogOut} label="End" tone="danger" onClick={agent.disconnect} />
+        <button
+          type="button"
+          className={`control-button danger${endArmed ? ' confirm' : ''}`}
+          aria-label={endArmed ? 'Tap again to confirm ending the session' : 'End session'}
+          onClick={handleEndClick}
+          onBlur={() => setEndArmed(false)}
+        >
+          <LogOut aria-hidden="true" size={18} strokeWidth={2.1} />
+          <span>{endArmed ? 'Tap to confirm' : 'End'}</span>
+        </button>
       </nav>
 
       {textModeOpen ? (
