@@ -525,7 +525,7 @@ export default function Page() {
                 onChange={(event) => setTypedMessage(event.target.value)}
                 placeholder="Type your answer, or try 'review Spanish'"
               />
-              <button type="submit" className="primary-control">
+              <button type="submit" className="control-button primary">
                 <Send aria-hidden="true" size={17} />
                 Send
               </button>

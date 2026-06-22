@@ -788,8 +788,6 @@ h1 {
 
 .control-button,
 .secondary-button,
-.primary-control,
-.danger-button,
 .icon-button,
 .quick-actions button {
   display: inline-flex;
@@ -807,33 +805,28 @@ h1 {
   font-weight: var(--weight-semibold);
 }
 
-.control-button.primary,
-.primary-control {
+.control-button.primary {
   border-color: transparent;
   background: var(--accent);
   color: var(--accent-contrast);
   font-weight: var(--weight-bold);
 }
 
-.control-button.primary:hover,
-.primary-control:hover {
+.control-button.primary:hover {
   background: var(--accent-hover);
 }
 
-.control-button.primary:active,
-.primary-control:active {
+.control-button.primary:active {
   background: var(--accent-press);
 }
 
-.control-button.danger,
-.danger-button {
+.control-button.danger {
   border-color: rgba(192, 57, 43, 0.4);
   background: transparent;
   color: var(--again-text);
 }
 
-.control-button.danger:hover,
-.danger-button:hover {
+.control-button.danger:hover {
   border-color: var(--again);
   background: var(--again-soft);
 }
@@ -1120,6 +1113,10 @@ h1 {
     flex-direction: column;
     gap: 3px;
     font-size: var(--text-2xs);
+  }
+
+  .control-button.danger {
+    margin-left: 6px;
   }
 
   .floating-panel {
