@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useMemo, useState, type CSSProperties } from 'react'
+import { FormEvent, useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react'
 import Image from 'next/image'
 import {
   CircleHelp,
@@ -58,9 +58,26 @@ function ControlButton({ icon: Icon, label, onClick, tone = 'default', pressed }
 export default function Page() {
   const agent = useDeepgramVoiceAgent()
   const [typedMessage, setTypedMessage] = useState('')
-  const [textModeOpen, setTextModeOpen] = useState(false)
-  const [helpOpen, setHelpOpen] = useState(false)
-  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [activeOverlay, setActiveOverlay] = useState<'text' | 'help' | 'settings' | null>(null)
+  const textModeOpen = activeOverlay === 'text'
+  const helpOpen = activeOverlay === 'help'
+  const settingsOpen = activeOverlay === 'settings'
+
+  const closeOverlay = useCallback(() => setActiveOverlay(null), [])
+  const toggleOverlay = useCallback(
+    (overlay: 'text' | 'help' | 'settings') =>
+      setActiveOverlay((current) => (current === overlay ? null : overlay)),
+    [],
+  )
+
+  useEffect(() => {
+    if (!activeOverlay) return
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') closeOverlay()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [activeOverlay, closeOverlay])
 
   const latestUser = [...agent.transcript].reverse().find((item) => item.speaker === 'You')
   const latestAgent = [...agent.transcript].reverse().find((item) => item.speaker === 'Agent')
@@ -220,6 +237,8 @@ export default function Page() {
         </aside>
       </div>
 
+      {activeOverlay ? <div className="overlay-backdrop" aria-hidden="true" onClick={closeOverlay} /> : null}
+
       {helpOpen ? (
         <section className="floating-panel command-overlay" aria-labelledby="command-title">
           <div className="panel-header">
@@ -231,7 +250,7 @@ export default function Page() {
               type="button"
               className="icon-button"
               aria-label="Close voice commands"
-              onClick={() => setHelpOpen(false)}
+              onClick={closeOverlay}
             >
               <X aria-hidden="true" size={18} />
             </button>
@@ -255,7 +274,7 @@ export default function Page() {
               type="button"
               className="icon-button"
               aria-label="Close settings"
-              onClick={() => setSettingsOpen(false)}
+              onClick={closeOverlay}
             >
               <X aria-hidden="true" size={18} />
             </button>
@@ -302,12 +321,17 @@ export default function Page() {
       ) : null}
 
       <nav className="bottom-controls" aria-label="Review controls">
-        <ControlButton icon={Settings} label="Settings" onClick={() => setSettingsOpen((open) => !open)} />
+        <ControlButton
+          icon={Settings}
+          label="Settings"
+          pressed={settingsOpen}
+          onClick={() => toggleOverlay('settings')}
+        />
         <ControlButton
           icon={Keyboard}
           label="Text"
           pressed={textModeOpen}
-          onClick={() => setTextModeOpen((open) => !open)}
+          onClick={() => toggleOverlay('text')}
         />
         <button
           type="button"
@@ -329,7 +353,7 @@ export default function Page() {
           )}
           <span>{agent.isConnected ? (agent.isMuted ? 'Unmute' : 'Mute') : 'Start'}</span>
         </button>
-        <ControlButton icon={CircleHelp} label="Help" onClick={() => setHelpOpen((open) => !open)} />
+        <ControlButton icon={CircleHelp} label="Help" pressed={helpOpen} onClick={() => toggleOverlay('help')} />
         <ControlButton icon={LogOut} label="End" tone="danger" onClick={agent.disconnect} />
       </nav>
 
@@ -340,7 +364,7 @@ export default function Page() {
               <p className="eyebrow">Fallback mode</p>
               <h2 id="text-mode-title">Text review</h2>
             </div>
-            <button type="button" className="secondary-button" onClick={() => setTextModeOpen(false)}>
+            <button type="button" className="secondary-button" onClick={closeOverlay}>
               <Mic aria-hidden="true" size={17} />
               Return to voice
             </button>

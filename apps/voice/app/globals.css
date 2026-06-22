@@ -111,6 +111,11 @@
   --shadow-lg: 0 22px 56px rgba(4, 10, 20, 0.5);
   --shadow-glow-cyan: 0 0 0 4px rgba(32, 208, 255, 0.18);
 
+  --z-base: 1;
+  --z-controls: 2;
+  --z-backdrop: 30;
+  --z-overlay: 31;
+
   --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
   --dur-fast: 0.12s;
   --dur-base: 0.16s;
@@ -325,12 +330,39 @@ h2 {
 }
 
 .app-header,
-.app-workspace,
-.bottom-controls,
+.app-workspace {
+  position: relative;
+  z-index: var(--z-base);
+}
+
+.bottom-controls {
+  z-index: var(--z-controls);
+}
+
+.overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-backdrop);
+  background: var(--overlay-bg);
+  opacity: 0;
+  animation: overlay-backdrop-in var(--dur-base) var(--ease-out) forwards;
+}
+
 .floating-panel,
 .support-drawer {
-  position: relative;
-  z-index: 2;
+  z-index: var(--z-overlay);
+}
+
+@keyframes overlay-backdrop-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay-backdrop {
+    animation-duration: 0.01ms;
+  }
 }
 
 .app-header {
