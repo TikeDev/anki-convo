@@ -5,7 +5,7 @@ import AuthModal from './AuthModal'
 import ThemeToggle from './ThemeToggle'
 import { useAuth } from './AuthProvider'
 
-const VOICE_APP_URL = process.env.NEXT_PUBLIC_VOICE_APP_URL ?? '#'
+const VOICE_APP_URL = 'https://anki-convo-voice.vercel.app/'
 
 export default function Navbar() {
   const [modal, setModal] = useState<'login' | 'signup' | null>(null)

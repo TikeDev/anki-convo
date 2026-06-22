@@ -14,9 +14,9 @@ const config: Config = {
         'surface-alt': 'var(--surface-alt)',
         border: 'var(--border)',
         salmon: {
-          DEFAULT: '#E8736A',
-          hover: '#F0948D',
-          dim: 'rgba(232,115,106,0.15)',
+          DEFAULT: '#2180C9',
+          hover: '#3A93D4',
+          dim: 'rgba(33,128,201,0.15)',
         },
         text: {
           primary: 'var(--text-primary)',
