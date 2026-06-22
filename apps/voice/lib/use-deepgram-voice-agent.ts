@@ -448,6 +448,7 @@ export function useDeepgramVoiceAgent() {
 
   const connect = useCallback(async () => {
     if (socketRef.current?.readyState === WebSocket.OPEN) return
+    if (status === 'connecting') return
     setError(null)
     setStatus('connecting')
 
@@ -503,7 +504,7 @@ export function useDeepgramVoiceAgent() {
       setIsConnected(false)
       stopAudio()
     }
-  }, [handleJsonEvent, playPcmAudio, startAudio, stopAudio])
+  }, [handleJsonEvent, playPcmAudio, startAudio, status, stopAudio])
 
   const toggleMute = useCallback(() => {
     setIsMuted((muted) => {
@@ -595,6 +596,7 @@ export function useDeepgramVoiceAgent() {
     isAnswerVisible,
     isMuted,
     isConnected,
+    isConnecting: status === 'connecting',
     error,
     voiceMode,
     inputDevices,

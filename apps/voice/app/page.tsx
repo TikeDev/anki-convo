@@ -5,6 +5,7 @@ import Image from 'next/image'
 import {
   CircleHelp,
   Keyboard,
+  Loader2,
   LogOut,
   Mic,
   MicOff,
@@ -124,6 +125,7 @@ export default function Page() {
   }
 
   function togglePrimaryMic() {
+    if (agent.isConnecting) return
     if (!agent.isConnected) {
       void agent.connect()
       return
@@ -349,21 +351,29 @@ export default function Page() {
           type="button"
           className="control-button primary"
           aria-label={
-            agent.isConnected
-              ? agent.isMuted
-                ? 'Unmute microphone'
-                : 'Mute microphone'
-              : 'Start voice session'
+            agent.isConnecting
+              ? 'Connecting to voice session'
+              : agent.isConnected
+                ? agent.isMuted
+                  ? 'Unmute microphone'
+                  : 'Mute microphone'
+                : 'Start voice session'
           }
           aria-pressed={agent.isMuted}
+          aria-busy={agent.isConnecting}
+          disabled={agent.isConnecting}
           onClick={togglePrimaryMic}
         >
-          {agent.isMuted ? (
+          {agent.isConnecting ? (
+            <Loader2 aria-hidden="true" size={19} strokeWidth={2.1} className="spin" />
+          ) : agent.isMuted ? (
             <MicOff aria-hidden="true" size={19} strokeWidth={2.1} />
           ) : (
             <Mic aria-hidden="true" size={19} strokeWidth={2.1} />
           )}
-          <span>{agent.isConnected ? (agent.isMuted ? 'Unmute' : 'Mute') : 'Start'}</span>
+          <span>
+            {agent.isConnecting ? 'Connecting…' : agent.isConnected ? (agent.isMuted ? 'Unmute' : 'Mute') : 'Start'}
+          </span>
         </button>
         <ControlButton icon={CircleHelp} label="Help" pressed={helpOpen} onClick={() => toggleOverlay('help')} />
         <ControlButton icon={LogOut} label="End" tone="danger" onClick={agent.disconnect} />
