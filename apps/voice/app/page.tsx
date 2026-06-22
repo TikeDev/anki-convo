@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react'
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import Image from 'next/image'
 import {
   CircleHelp,
@@ -62,6 +62,7 @@ export default function Page() {
   const textModeOpen = activeOverlay === 'text'
   const helpOpen = activeOverlay === 'help'
   const settingsOpen = activeOverlay === 'settings'
+  const bottomControlsRef = useRef<HTMLElement>(null)
 
   const closeOverlay = useCallback(() => setActiveOverlay(null), [])
   const toggleOverlay = useCallback(
@@ -78,6 +79,17 @@ export default function Page() {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [activeOverlay, closeOverlay])
+
+  useEffect(() => {
+    const node = bottomControlsRef.current
+    if (!node) return
+    const root = document.documentElement
+    const observer = new ResizeObserver(() => {
+      root.style.setProperty('--bottom-controls-h', `${Math.ceil(node.getBoundingClientRect().height)}px`)
+    })
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
 
   const latestUser = [...agent.transcript].reverse().find((item) => item.speaker === 'You')
   const latestAgent = [...agent.transcript].reverse().find((item) => item.speaker === 'Agent')
@@ -320,7 +332,7 @@ export default function Page() {
         </section>
       ) : null}
 
-      <nav className="bottom-controls" aria-label="Review controls">
+      <nav className="bottom-controls" aria-label="Review controls" ref={bottomControlsRef}>
         <ControlButton
           icon={Settings}
           label="Settings"

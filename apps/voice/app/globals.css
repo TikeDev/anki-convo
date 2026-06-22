@@ -280,7 +280,7 @@ h2 {
   position: relative;
   min-height: 100svh;
   overflow-x: hidden;
-  padding: 22px 24px 96px;
+  padding: 22px 24px calc(var(--bottom-controls-h, 76px) + var(--space-5));
 }
 
 .ambient-glow {
@@ -1007,7 +1007,7 @@ h1 {
 
 @media (max-width: 760px) {
   .review-shell {
-    padding: 72px 12px 108px;
+    padding: 72px 12px calc(var(--bottom-controls-h, 92px) + var(--space-5));
   }
 
   .global-theme-toggle {
