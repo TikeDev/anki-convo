@@ -650,6 +650,67 @@ h1 {
   gap: 12px;
 }
 
+.rating-notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.rating-correction {
+  display: flex;
+  gap: 6px;
+}
+
+.rating-correction button {
+  min-height: 30px;
+  padding: 0 10px;
+  background: transparent;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+}
+
+.rating-correction button:nth-child(1) {
+  border-color: rgba(192, 57, 43, 0.4);
+  color: var(--again-text);
+}
+
+.rating-correction button:nth-child(1):hover {
+  background: var(--again-soft);
+  border-color: var(--again);
+}
+
+.rating-correction button:nth-child(2) {
+  border-color: rgba(230, 126, 34, 0.4);
+  color: var(--hard-text);
+}
+
+.rating-correction button:nth-child(2):hover {
+  background: var(--hard-soft);
+  border-color: var(--hard);
+}
+
+.rating-correction button:nth-child(3) {
+  border-color: rgba(39, 174, 96, 0.4);
+  color: var(--good-text);
+}
+
+.rating-correction button:nth-child(3):hover {
+  background: var(--good-soft);
+  border-color: var(--good);
+}
+
+.rating-correction button:nth-child(4) {
+  border-color: rgba(47, 143, 214, 0.4);
+  color: var(--easy-text);
+}
+
+.rating-correction button:nth-child(4):hover {
+  background: var(--easy-soft);
+  border-color: var(--easy);
+}
+
 .notice-retry {
   flex: 0 0 auto;
   min-height: 28px;

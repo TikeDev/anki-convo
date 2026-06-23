@@ -558,6 +558,28 @@ export function useDeepgramVoiceAgent() {
     [appendTranscript, revealAnswer, sendJson],
   )
 
+  const correctLastRating = useCallback(
+    async (rating: string) => {
+      const target = lastCommittedRatingRef.current
+      if (!target) return
+      const result = (await executeDemoAnkiFunction('rate_card', {
+        card_id: target.cardId,
+        rating,
+      })) as Record<string, unknown>
+      if (result.ok !== true) return
+      const ratingLabel = String(result.rating_label ?? result.rating ?? rating)
+      appendTranscript('You', `Actually, ${ratingLabel.toLowerCase()}`)
+      const committedRating = {
+        cardId: target.cardId,
+        rating: String(result.rating ?? ratingLabel),
+        ratingLabel,
+      }
+      lastCommittedRatingRef.current = committedRating
+      setLastCommittedRating(committedRating)
+    },
+    [appendTranscript],
+  )
+
   const setSelectedInput = useCallback(
     (deviceId: string) => {
       setSelectedInputDeviceId(deviceId)
@@ -622,6 +644,7 @@ export function useDeepgramVoiceAgent() {
     revealAnswer,
     setVoiceMode,
     injectText,
+    correctLastRating,
     setSelectedInput,
     setSelectedOutput,
   }

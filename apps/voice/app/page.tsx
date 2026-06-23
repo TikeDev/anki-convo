@@ -68,6 +68,8 @@ export default function Page() {
   const overlayTriggerRef = useRef<HTMLElement | null>(null)
   const [endArmed, setEndArmed] = useState(false)
   const endArmTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [correctableCardId, setCorrectableCardId] = useState<string | null>(null)
+  const correctionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const closeOverlay = useCallback(() => setActiveOverlay(null), [])
   const toggleOverlay = useCallback((overlay: 'text' | 'help' | 'settings') => {
@@ -129,12 +131,30 @@ export default function Page() {
   useEffect(() => {
     return () => {
       if (endArmTimeoutRef.current) clearTimeout(endArmTimeoutRef.current)
+      if (correctionTimeoutRef.current) clearTimeout(correctionTimeoutRef.current)
     }
   }, [])
 
   useEffect(() => {
     if (!agent.isConnected) setEndArmed(false)
   }, [agent.isConnected])
+
+  useEffect(() => {
+    const cardId = agent.lastCommittedRating?.cardId ?? null
+    if (!cardId) return
+    setCorrectableCardId(cardId)
+    if (correctionTimeoutRef.current) clearTimeout(correctionTimeoutRef.current)
+    correctionTimeoutRef.current = setTimeout(() => setCorrectableCardId(null), 5000)
+  }, [agent.lastCommittedRating])
+
+  const handleCorrectRating = useCallback(
+    (rating: string) => {
+      if (correctionTimeoutRef.current) clearTimeout(correctionTimeoutRef.current)
+      setCorrectableCardId(null)
+      void agent.correctLastRating(rating)
+    },
+    [agent],
+  )
 
   const handleEndClick = useCallback(() => {
     if (!endArmed) {
@@ -274,7 +294,25 @@ export default function Page() {
               </p>
             ) : null}
             {agent.lastCommittedRating ? (
-              <p className="rating-notice">Last rating: {agent.lastCommittedRating.ratingLabel}</p>
+              <div className="rating-notice">
+                <span>Last rating: {agent.lastCommittedRating.ratingLabel}</span>
+                {correctableCardId === agent.lastCommittedRating.cardId ? (
+                  <div className="rating-correction" aria-label="Correct the last rating">
+                    <button type="button" onClick={() => handleCorrectRating('again')}>
+                      Again
+                    </button>
+                    <button type="button" onClick={() => handleCorrectRating('hard')}>
+                      Hard
+                    </button>
+                    <button type="button" onClick={() => handleCorrectRating('good')}>
+                      Good
+                    </button>
+                    <button type="button" onClick={() => handleCorrectRating('easy')}>
+                      Easy
+                    </button>
+                  </div>
+                ) : null}
+              </div>
             ) : null}
             <div className="caption-strip" aria-label="Latest transcript">
               <p>
